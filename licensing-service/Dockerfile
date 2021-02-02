@@ -1,0 +1,34 @@
+# Stage 1
+# Start with a base image containing Java runtime
+FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk11u-nightly-slim as build
+
+# Add Maintainer Info
+LABEL maintainer="Vitalii Drahun <vdrag00n90@gmail.com>"
+
+# The application's jar file, will be set by maven docker plugin
+ARG JAR_FILE
+
+# Add the application's jar to the container
+COPY ${JAR_FILE} app.jar
+
+# Unpackage the jar file
+RUN mkdir -p target/dependency && (cd target/dependency; jar -xf /app.jar)
+
+# Stage 2
+# Same Java runtime
+FROM adoptopenjdk/openjdk11:alpine-jre
+
+# Add volume pointing to /tmp
+VOLUME /tmp
+
+# Install nc (netcat), a utility that you’ll use to ping dependent services to see if they are up
+RUN apk update && apk upgrade && apk add netcat-openbsd
+
+# Copy unpackaged application to new container
+ARG DEPENDENCY=/target/dependency
+COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
+COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
+COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
+
+# Execute the application on container startup
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.optimagrowth.license.LicenseServiceApplication"]
