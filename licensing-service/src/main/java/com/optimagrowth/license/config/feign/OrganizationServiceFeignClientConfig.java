@@ -2,6 +2,8 @@ package com.optimagrowth.license.config.feign;
 
 import com.optimagrowth.license.exception.FeignClientException;
 import com.optimagrowth.license.exception.ResourceNotFoundException;
+import com.optimagrowth.license.usercontext.UserContextHolder;
+import feign.RequestInterceptor;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.springframework.context.annotation.Bean;
@@ -13,10 +15,20 @@ public class OrganizationServiceFeignClientConfig {
 
     @Bean
     public ErrorDecoder errorDecoder() {
-        return new OrganizationServiceClientErrorDecoder();
+        return new ServiceClientErrorDecoder();
     }
 
-    private static class OrganizationServiceClientErrorDecoder implements ErrorDecoder {
+    @Bean
+    public RequestInterceptor clientIdRequestInterceptor() {
+        return new CorrelationIdRequestInterceptor(() -> UserContextHolder.getContext().getCorrelationId());
+    }
+
+    @Bean
+    public RequestInterceptor authTokenRequestInterceptor() {
+        return new AuthTokenRequestInterceptor(() -> UserContextHolder.getContext().getAuthToken());
+    }
+
+    public static class ServiceClientErrorDecoder implements ErrorDecoder {
 
         @Override
         public Exception decode(String methodKey, Response response) {
@@ -28,4 +40,5 @@ public class OrganizationServiceFeignClientConfig {
             return new FeignClientException("Error calling organization-service:[%s]", response.body().toString());
         }
     }
+
 }

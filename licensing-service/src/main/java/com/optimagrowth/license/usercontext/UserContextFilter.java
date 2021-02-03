@@ -1,5 +1,6 @@
 package com.optimagrowth.license.usercontext;
 
+import com.optimagrowth.license.config.Constants.Headers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,10 +19,10 @@ public class UserContextFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         LOG.debug("Intercepting new user request and setting UserContext instance....");
 
-        String correlationId = request.getHeader(UserContext.CORRELATION_ID);
-        String userId = request.getHeader(UserContext.USER_ID);
-        String authToken = request.getHeader(UserContext.AUTH_TOKEN);
-        String organizationId = request.getHeader(UserContext.ORGANIZATION_ID);
+        String correlationId = request.getHeader(Headers.CORRELATION_ID);
+        String userId = request.getHeader(Headers.USER_ID);
+        String authToken = request.getHeader(Headers.AUTH_TOKEN);
+        String organizationId = request.getHeader(Headers.ORGANIZATION_ID);
 
         UserContextHolder.setContext(new UserContext(correlationId, authToken, userId, organizationId));
 

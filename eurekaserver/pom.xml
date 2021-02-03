@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.optimagrowth</groupId>
         <artifactId>ostock-parent-pom</artifactId>
-        <version>0.0.3-SNAPSHOT</version>
+        <version>0.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>eurekaserver</artifactId>
