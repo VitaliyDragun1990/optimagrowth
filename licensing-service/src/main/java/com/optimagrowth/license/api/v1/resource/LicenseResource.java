@@ -4,6 +4,7 @@ import com.optimagrowth.license.api.ApiVersion;
 import com.optimagrowth.license.api.v1.dto.LicenseDto;
 import com.optimagrowth.license.domain.service.LicenseService;
 import com.optimagrowth.license.domain.service.License;
+import com.optimagrowth.license.usercontext.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -37,7 +38,8 @@ public class LicenseResource {
 
     @GetMapping("/{organizationId}/licenses")
     public List<LicenseDto> getLicenses(@PathVariable("organizationId") String organizationId) {
-        LOG.debug("Received GET request to search for licenses for organization with id:[{}]", organizationId);
+        LOG.debug("Received GET request to search for licenses for organization with id:[{}], Correlation Id: {}",
+                organizationId, UserContextHolder.getContext().getCorrelationId());
 
         List<License> licenses = licenseService.getLicenses(organizationId);
 
