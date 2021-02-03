@@ -21,9 +21,6 @@ FROM adoptopenjdk/openjdk11:alpine-jre
 # Add volume pointing to /tmp
 VOLUME /tmp
 
-# Install nc (netcat), a utility that you’ll use to ping dependent services to see if they are up
-RUN apk update && apk upgrade && apk add netcat-openbsd
-
 # Copy unpackaged application to new container
 ARG DEPENDENCY=/target/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib

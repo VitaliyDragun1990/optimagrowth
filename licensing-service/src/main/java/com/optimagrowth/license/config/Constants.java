@@ -2,8 +2,8 @@ package com.optimagrowth.license.config;
 
 public final class Constants {
 
-    private Constants() {}
-
+    private Constants() {
+    }
 
     public static final class Messages {
 
