@@ -1,6 +1,6 @@
 # Stage 1
 # Start with a base image containing Java runtime
-FROM adoptopenjdk/openjdk11:x86_64-alpine-jdk11u-nightly-slim as build
+FROM adoptopenjdk/openjdk11:jdk-11.0.10_9-slim as build
 
 # Add Maintainer Info
 LABEL maintainer="Vitalii Drahun <vdrag00n90@gmail.com>"
@@ -16,7 +16,7 @@ RUN mkdir -p target/dependency && (cd target/dependency; jar -xf /app.jar)
 
 # Stage 2
 # Same Java runtime
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM adoptopenjdk/openjdk11:jre-11.0.10_9-alpine
 
 # Add volume pointing to /tmp
 VOLUME /tmp

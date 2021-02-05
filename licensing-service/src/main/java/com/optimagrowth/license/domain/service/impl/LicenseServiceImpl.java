@@ -63,7 +63,7 @@ public class LicenseServiceImpl implements LicenseService {
     @CircuitBreaker(name = "licenseService", fallbackMethod = "getLicensesFallback")
     @RateLimiter(name = "licenseService", fallbackMethod = "getLicensesFallback")
     @Retry(name = "retryLicenseService", fallbackMethod = "getLicensesFallback")
-    @Bulkhead(name = "bulkheadLicenseService", type = Type.THREADPOOL, fallbackMethod = "getLicensesFallback")
+    @Bulkhead(name = "bulkheadLicenseService", type = Type.SEMAPHORE, fallbackMethod = "getLicensesFallback")
     @Override
     public List<License> getLicenses(String organizationId) {
         LOG.debug("Searching for licenses for organization with id:[{}]", organizationId);

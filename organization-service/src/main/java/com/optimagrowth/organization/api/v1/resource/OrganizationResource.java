@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,7 @@ public class OrganizationResource {
     private final ModelMapper mapper;
 
     @GetMapping("/{organizationId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public OrganizationDto getOrganization(@PathVariable("organizationId") String organizationId) {
         LOG.debug("Received GET request to search for organization with id:[{}]", organizationId);
 
@@ -51,6 +53,7 @@ public class OrganizationResource {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public List<OrganizationDto> getOrganizations() {
         LOG.debug("Received GET request to search for all organizations");
 
@@ -64,6 +67,7 @@ public class OrganizationResource {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public OrganizationDto saveOrganization(@RequestBody OrganizationDto request) {
         LOG.debug("Received POST request to save organization with data:{}", request);
 
@@ -77,6 +81,7 @@ public class OrganizationResource {
     }
 
     @PutMapping("/{organizationId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public OrganizationDto updateOrganization(
             @PathVariable("organizationId") String organizationId,
             @RequestBody OrganizationDto request) {
@@ -92,6 +97,7 @@ public class OrganizationResource {
     }
 
     @DeleteMapping("/{organizationId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteOrganization(@PathVariable("organizationId") String organizationId) {
         service.deleteById(organizationId);
 
