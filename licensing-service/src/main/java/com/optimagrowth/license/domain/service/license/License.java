@@ -1,5 +1,6 @@
-package com.optimagrowth.license.domain.service;
+package com.optimagrowth.license.domain.service.license;
 
+import com.optimagrowth.license.domain.service.organization.Organization;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

@@ -1,4 +1,4 @@
-package com.optimagrowth.license.domain.repository;
+package com.optimagrowth.license.domain.repository.jpa;
 
 import com.optimagrowth.license.domain.entity.LicenseEntity;
 import org.springframework.data.repository.CrudRepository;

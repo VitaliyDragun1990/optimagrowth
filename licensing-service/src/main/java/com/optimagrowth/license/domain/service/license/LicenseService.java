@@ -1,4 +1,6 @@
-package com.optimagrowth.license.domain.service;
+package com.optimagrowth.license.domain.service.license;
+
+import com.optimagrowth.license.domain.service.license.License;
 
 import java.util.List;
 

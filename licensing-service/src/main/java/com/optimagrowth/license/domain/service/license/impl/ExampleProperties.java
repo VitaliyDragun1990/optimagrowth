@@ -1,4 +1,4 @@
-package com.optimagrowth.license.domain.service.impl;
+package com.optimagrowth.license.domain.service.license.impl;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

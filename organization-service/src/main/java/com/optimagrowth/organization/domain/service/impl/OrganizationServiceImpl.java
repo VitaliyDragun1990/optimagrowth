@@ -1,6 +1,8 @@
 package com.optimagrowth.organization.domain.service.impl;
 
 import com.optimagrowth.organization.domain.entity.OrganizationEntity;
+import com.optimagrowth.organization.domain.event.publisher.OrganizationEventPublisher;
+import com.optimagrowth.organization.domain.event.model.EventType;
 import com.optimagrowth.organization.domain.repository.OrganizationRepository;
 import com.optimagrowth.organization.domain.service.OrganizationService;
 import com.optimagrowth.organization.domain.service.model.Organization;
@@ -25,6 +27,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final ModelMapper mapper;
 
+    private final OrganizationEventPublisher eventPublisher;
+
     @Override
     public Organization findById(String organizationId) {
         LOG.debug("Searching for organization with id:[{}]", organizationId);
@@ -34,6 +38,8 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Organization with id:%s not found", organizationId));
 
         Organization organization = mapper.map(organizationEntity, Organization.class);
+
+        eventPublisher.publishOrganizationChange(EventType.READ, organizationId);
 
         LOG.debug("Found organization with id:[{}]", organizationId);
 
@@ -63,6 +69,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         organizationRepository.save(organizationEntity);
 
+        eventPublisher.publishOrganizationChange(EventType.CREATE, organizationEntity.getId());
+
         LOG.debug("Created organization with data:{}", organizationEntity);
 
         return mapper.map(organizationEntity, Organization.class);
@@ -80,6 +88,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         updateOrganizationData(organizationEntity, organization);
         organizationRepository.save(organizationEntity);
 
+        eventPublisher.publishOrganizationChange(EventType.UPDATE, organizationEntity.getId());
+
         LOG.debug("Updated organization with data:{}", organizationEntity);
 
         return mapper.map(organizationEntity, Organization.class);
@@ -94,6 +104,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
 
         organizationRepository.deleteById(organizationId);
+
+        eventPublisher.publishOrganizationChange(EventType.DELETE, organizationId);
 
         LOG.debug("Deleted organization with id:[{}]", organizationId);
     }

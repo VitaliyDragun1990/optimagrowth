@@ -1,11 +1,12 @@
-package com.optimagrowth.license.domain.service.impl;
+package com.optimagrowth.license.domain.service.license.impl;
 
 import com.optimagrowth.license.config.Constants.Messages;
 import com.optimagrowth.license.domain.entity.LicenseEntity;
-import com.optimagrowth.license.domain.repository.LicenseRepository;
-import com.optimagrowth.license.domain.service.License;
-import com.optimagrowth.license.domain.service.LicenseService;
-import com.optimagrowth.license.domain.service.Organization;
+import com.optimagrowth.license.domain.repository.jpa.LicenseRepository;
+import com.optimagrowth.license.domain.service.license.LicenseService;
+import com.optimagrowth.license.domain.service.organization.OrganizationService;
+import com.optimagrowth.license.domain.service.license.License;
+import com.optimagrowth.license.domain.service.organization.Organization;
 import com.optimagrowth.license.exception.ResourceNotFoundException;
 import com.optimagrowth.license.provider.message.MessageProvider;
 import com.optimagrowth.license.usercontext.UserContextHolder;
@@ -36,7 +37,7 @@ public class LicenseServiceImpl implements LicenseService {
 
     private final LicenseRepository licenseRepository;
 
-    private final OrganizationClient organizationClient;
+    private final OrganizationService organizationService;
 
     private final ExampleProperties exampleProps;
 
@@ -44,13 +45,14 @@ public class LicenseServiceImpl implements LicenseService {
 
     @Override
     public License getLicense(String licenseId, String organizationId) {
-        LOG.debug("Searching for license with id:[{}] for organization with id:[{}]", licenseId, organizationId);
+        LOG.debug("Searching for license with id:[{}] for organization with id:[{}], Correlation Id:{}",
+                licenseId, organizationId, UserContextHolder.getContext().getCorrelationId());
 
         LicenseEntity licenseEntity = licenseRepository
                 .findByOrganizationIdAndLicenseId(organizationId, licenseId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageProvider.message(Messages.SEARCH_ERROR, licenseId, organizationId)));
 
-        Organization organization = organizationClient.findById(organizationId);
+        Organization organization = organizationService.findById(organizationId);
 
         License license = mapper.map(licenseEntity, License.class);
         license.setOrganization(organization);
@@ -70,7 +72,7 @@ public class LicenseServiceImpl implements LicenseService {
 
         randomlyRunLong();
 
-        Organization organization = organizationClient.findById(organizationId);
+        Organization organization = organizationService.findById(organizationId);
 
         List<LicenseEntity> licenseEntities = licenseRepository.findByOrganizationId(organizationId);
 
@@ -101,7 +103,7 @@ public class LicenseServiceImpl implements LicenseService {
 
     @Override
     public License updateLicense(License license) {
-        LOG.debug("Updating license using data:{}", license);
+        LOG.debug("Updating license using data:{}, Correlation Id:{}", license, UserContextHolder.getContext().getCorrelationId());
 
         LicenseEntity licenseEntity = mapper.map(license, LicenseEntity.class);
         licenseRepository.save(licenseEntity);
@@ -113,7 +115,7 @@ public class LicenseServiceImpl implements LicenseService {
 
     @Override
     public String deleteLicense(String licenseId) {
-        LOG.debug("Deleting license with id:{}", licenseId);
+        LOG.debug("Deleting license with id:{}, Correlation Id:{}", licenseId, UserContextHolder.getContext().getCorrelationId());
 
         licenseRepository.deleteById(licenseId);
 
