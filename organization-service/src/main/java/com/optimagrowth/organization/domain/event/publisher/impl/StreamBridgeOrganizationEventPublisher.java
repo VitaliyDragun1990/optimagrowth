@@ -22,7 +22,7 @@ public class StreamBridgeOrganizationEventPublisher implements OrganizationEvent
     private final DateTimeProvider dateTimeProvider;
 
     public StreamBridgeOrganizationEventPublisher(
-            @Value("${spring.cloud.stream.outputBinding}") String outputBindingName,
+            @Value("${spring.cloud.stream.source}") String outputBindingName,
             StreamBridge stream,
             DateTimeProvider dateTimeProvider) {
         this.outputBindingName = outputBindingName;

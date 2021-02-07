@@ -21,6 +21,7 @@
         <spring-cloud.version>2020.0.0</spring-cloud.version>
         <keycloak.version>12.0.2</keycloak.version>
         <json.version>20201115</json.version>
+        <logstash-logback-encoder.version>6.5</logstash-logback-encoder.version>
     </properties>
 
     <modules>

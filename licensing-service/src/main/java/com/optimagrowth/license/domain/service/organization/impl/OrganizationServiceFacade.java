@@ -30,6 +30,7 @@ public class OrganizationServiceFacade implements OrganizationService {
         if (organizationFromCache.isEmpty()) {
             LOG.debug("Unable to locate organization with id:[{}] in the cache", organizationId);
 
+            LOG.debug("Sending request to get organization with id:[{}] using client", organizationId);
             Organization organization = organizationClient.findById(organizationId);
             LOG.debug("Get organization with id:[{}] using client", organization);
 
