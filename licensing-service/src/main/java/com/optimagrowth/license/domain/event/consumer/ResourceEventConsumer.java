@@ -21,9 +21,6 @@ public class ResourceEventConsumer {
     @Bean
     public Consumer<ResourceChangeEvent<String>> organizationChange() {
         return event -> {
-            LOG.debug("Received {} event for {} resource with id {}, Correlation Id:{}",
-                    event.getEventType(), event.getResourceType(), event.getResourceId(), event.getCorrelationId());
-
             if (ResourceTypes.ORGANIZATION.equals(event.getResourceType())) {
                 handleOrganizationEvent(event.getEventType(), event.getResourceId());
             }

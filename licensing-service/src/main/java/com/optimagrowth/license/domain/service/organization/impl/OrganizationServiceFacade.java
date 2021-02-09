@@ -7,6 +7,8 @@ import com.optimagrowth.license.domain.service.organization.OrganizationService;
 import com.optimagrowth.license.usercontext.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.sleuth.ScopedSpan;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,9 +18,15 @@ import java.util.Optional;
 @Service
 public class OrganizationServiceFacade implements OrganizationService {
 
+    private static final String SPAN_READ_ORGANIZATION_FROM_CACHE = "readOrganizationDataFromCache";
+
+    private static final String CACHE_PROVIDER_REDIS = "redis";
+
     private final OrganizationClient organizationClient;
 
     private final OrganizationCache organizationCache;
+
+    private final Tracer tracer;
 
     @Override
     public Organization findById(String organizationId) {
@@ -55,11 +63,16 @@ public class OrganizationServiceFacade implements OrganizationService {
     }
 
     private Optional<Organization> findInCache(String organizationId) {
+        ScopedSpan newSpan = tracer.startScopedSpan(SPAN_READ_ORGANIZATION_FROM_CACHE);
         try {
             return organizationCache.findById(organizationId);
         } catch (Exception e) {
             LOG.warn("Error while looking organization with id:[{}] in the cache:{}", organizationId, e.getMessage(), e);
             return Optional.empty();
+        } finally {
+            newSpan.tag("peer.service", CACHE_PROVIDER_REDIS);
+            newSpan.event("Client received");
+            newSpan.end();
         }
     }
 }

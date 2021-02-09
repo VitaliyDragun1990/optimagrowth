@@ -1,37 +1,25 @@
 package com.optimagrowth.organization.domain.event.publisher.impl;
 
-import com.optimagrowth.organization.domain.event.publisher.OrganizationEventPublisher;
 import com.optimagrowth.organization.domain.event.model.EventType;
 import com.optimagrowth.organization.domain.event.model.ResourceChangeEvent;
 import com.optimagrowth.organization.domain.event.model.ResourceType;
+import com.optimagrowth.organization.domain.event.publisher.OrganizationEventPublisher;
 import com.optimagrowth.organization.provider.date.DateTimeProvider;
 import com.optimagrowth.organization.usercontext.UserContextHolder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.cloud.stream.messaging.Source;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
-/**
- * Spring cloud sleuth can not instrument StreamBridge calls to add correct traceId/spanId
- */
 @Slf4j
-//@Component
-public class StreamBridgeOrganizationEventPublisher implements OrganizationEventPublisher {
+@RequiredArgsConstructor
+@Component
+public class SimpleSourceEventPublisher implements OrganizationEventPublisher {
 
-    private final String outputBindingName;
-
-    private final StreamBridge stream;
+    private final Source source;
 
     private final DateTimeProvider dateTimeProvider;
-
-    public StreamBridgeOrganizationEventPublisher(
-            @Value("${spring.cloud.stream.source}") String outputBindingName,
-            StreamBridge stream,
-            DateTimeProvider dateTimeProvider) {
-        this.outputBindingName = outputBindingName;
-        this.stream = stream;
-        this.dateTimeProvider = dateTimeProvider;
-    }
 
     @Override
     public void publishOrganizationChange(EventType eventType, String organizationId) {
@@ -47,7 +35,7 @@ public class StreamBridgeOrganizationEventPublisher implements OrganizationEvent
                 correlationId,
                 dateTimeProvider.currentDateTime());
 
-        boolean success = stream.send(outputBindingName, event);
+        boolean success = source.output().send(MessageBuilder.withPayload(event).build());
 
         LOG.debug("Event of type [{}] for Organization with id:[{}], Correlation Id:[{}] was sent, status:{}",
                 eventType, organizationId, correlationId, success ? "success" : "failure");

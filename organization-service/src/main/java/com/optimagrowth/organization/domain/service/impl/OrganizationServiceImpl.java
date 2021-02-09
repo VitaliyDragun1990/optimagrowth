@@ -10,6 +10,8 @@ import com.optimagrowth.organization.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cloud.sleuth.ScopedSpan;
+import org.springframework.cloud.sleuth.Tracer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,19 +25,23 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
+    private static final String SPAN_READ_ORGANIZATION_FROM_DB = "readOrganizationFromDB";
+
+    private static final String DB_POSTGRES = "postgres";
+
     private final OrganizationRepository organizationRepository;
 
     private final ModelMapper mapper;
 
     private final OrganizationEventPublisher eventPublisher;
 
+    private final Tracer tracer;
+
     @Override
     public Organization findById(String organizationId) {
         LOG.debug("Searching for organization with id:[{}]", organizationId);
 
-        OrganizationEntity organizationEntity = organizationRepository
-                .findById(organizationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Organization with id:%s not found", organizationId));
+        OrganizationEntity organizationEntity = getById(organizationId);
 
         Organization organization = mapper.map(organizationEntity, Organization.class);
 
@@ -81,9 +87,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     public Organization update(Organization organization) {
         LOG.debug("Updating organization using data:{}", organization);
 
-        OrganizationEntity organizationEntity = organizationRepository
-                .findById(organization.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Organization with id:%s not found", organization.getId()));
+        OrganizationEntity organizationEntity = getById(organization.getId());
 
         updateOrganizationData(organizationEntity, organization);
         organizationRepository.save(organizationEntity);
@@ -108,6 +112,19 @@ public class OrganizationServiceImpl implements OrganizationService {
         eventPublisher.publishOrganizationChange(EventType.DELETE, organizationId);
 
         LOG.debug("Deleted organization with id:[{}]", organizationId);
+    }
+
+    private OrganizationEntity getById(String organizationId) {
+        ScopedSpan newSpan = tracer.startScopedSpan(SPAN_READ_ORGANIZATION_FROM_DB);
+        try {
+            return organizationRepository
+                    .findById(organizationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Organization with id:%s not found", organizationId));
+        } finally {
+            newSpan.tag("peer.service", DB_POSTGRES);
+            newSpan.event("Client received");
+            newSpan.end();
+        }
     }
 
     private void updateOrganizationData(OrganizationEntity entity, Organization data) {

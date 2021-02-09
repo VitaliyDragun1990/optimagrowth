@@ -35,3 +35,5 @@ build/
 config/
 !**/src/main/**/config/
 !**/src/test/**/config/
+
+docker/.cache

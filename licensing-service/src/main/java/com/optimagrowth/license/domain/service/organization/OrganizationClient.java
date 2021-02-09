@@ -1,7 +1,6 @@
 package com.optimagrowth.license.domain.service.organization;
 
 import com.optimagrowth.license.config.feign.OrganizationServiceFeignClientConfig;
-import com.optimagrowth.license.domain.service.organization.Organization;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
