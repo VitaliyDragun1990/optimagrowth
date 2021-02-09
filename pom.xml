@@ -30,6 +30,7 @@
         <module>gatewayserver</module>
         <module>licensing-service</module>
         <module>organization-service</module>
+        <module>authentication-service</module>
     </modules>
 
     <repositories>
