@@ -139,26 +139,45 @@ services:
     networks:
       - backend
 
-  keycloak:
-    image: jboss/keycloak:12.0.2
-    #    restart: always
+  authenticationservice:
+    image: ostock/authentication-service:0.0.4-SNAPSHOT
+    container_name: authentication-service
     environment:
-      #      KEYCLOAK_VERSION: 6.0.1
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
-    volumes:
-      - ./realm-export.json:/opt/jboss/keycloak/realm-export.json
-    command:
-      - "-b 0.0.0.0"
-      - "-Dkeycloak.import=/opt/jboss/keycloak/realm-export.json"
-      - "-Dkeycloak.profile.feature.scripts=enabled"
-      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+      SPRING_PROFILES_ACTIVE: "dev"
+      SPRING_CLOUD_CONFIG_URI: "http://configserver:8071"
+      ENCRYPT_KEY: "IMSYMMETRIC"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_started
     ports:
-      - "8080:8080"
+      - "8082:8082"
     networks:
       backend:
         aliases:
-          - "keycloak"
+            - "authenticationservice"
+
+#  keycloak:
+#    image: jboss/keycloak:12.0.2
+#    #    restart: always
+#    environment:
+#      #      KEYCLOAK_VERSION: 6.0.1
+#      KEYCLOAK_USER: admin
+#      KEYCLOAK_PASSWORD: admin
+#    volumes:
+#      - ./realm-export.json:/opt/jboss/keycloak/realm-export.json
+#    command:
+#      - "-b 0.0.0.0"
+#      - "-Dkeycloak.import=/opt/jboss/keycloak/realm-export.json"
+#      - "-Dkeycloak.profile.feature.scripts=enabled"
+#      - "-Dkeycloak.profile.feature.upload_scripts=enabled"
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      backend:
+#        aliases:
+#          - "keycloak"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0

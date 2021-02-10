@@ -2,8 +2,8 @@ package com.optimagrowth.license.api.v1.resource;
 
 import com.optimagrowth.license.api.ApiVersion;
 import com.optimagrowth.license.api.v1.dto.LicenseDto;
-import com.optimagrowth.license.domain.service.license.LicenseService;
 import com.optimagrowth.license.domain.service.license.License;
+import com.optimagrowth.license.domain.service.license.LicenseService;
 import com.optimagrowth.license.usercontext.UserContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

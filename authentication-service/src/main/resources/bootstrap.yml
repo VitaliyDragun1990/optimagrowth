@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: authentication-service
+  profiles:
+    active: dev
+  cloud:
+    config:
+      uri: http://localhost:8071
+#      uri: http://configserver:8071
+
+jwt:
+  key:
+    private:
+      name: smia.jks
+      alias: smia
+      password: secretpass

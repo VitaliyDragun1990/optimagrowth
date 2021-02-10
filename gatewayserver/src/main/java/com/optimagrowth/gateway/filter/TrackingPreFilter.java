@@ -20,7 +20,7 @@ import java.util.UUID;
 @Order(1)
 public class TrackingPreFilter implements GlobalFilter {
 
-    private static final String PAYLOAD_USERNAME = "preferred_username";
+    private static final String AUTHENTICATION_NAME = "authentication_name";
 
     private static final String PREFIX_BEARER = "Bearer ";
 
@@ -53,7 +53,7 @@ public class TrackingPreFilter implements GlobalFilter {
             String authToken = authHeaderOptional.get().replace(PREFIX_BEARER, "");
             try {
                 Map<String, Object> tokenPayload = tokenParser.parse(authToken);
-                return tokenPayload.get(PAYLOAD_USERNAME).toString();
+                return tokenPayload.get(AUTHENTICATION_NAME).toString();
             } catch (Exception e) {
                 LOG.warn("Error parsing access token payload:{}", e.getMessage(), e);
             }
